@@ -2,15 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- ADD: Background capability -->
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>bluetooth-central</string>
-        <string>bluetooth-peripheral</string>
-        <string>external-accessory</string>
-        <string>nearby-interaction</string>
-        <string>remote-notification</string>
-    </array>
-    <!-- Other existing entries... -->
+	<key>NSBatteryUsageDescription</key>
+	<string>BatteryBridge needs to monitor battery level to share it with your Mac</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app uses Bonjour to discover and connect to your Mac</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_batterybridge._tcp.</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>network-authentication</string>
+	</array>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
 </dict>
 </plist>

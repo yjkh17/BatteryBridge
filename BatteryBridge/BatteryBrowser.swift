@@ -1,34 +1,46 @@
 import Network
 import SwiftUI
-import Combine
+import os.log
 
 class BatteryBrowser: ObservableObject {
     @Published var batteryLevel: Int = 0
     @Published var isConnected: Bool = false
+    
     private var browser: NWBrowser?
     private var connection: NWConnection?
+    private let logger = Logger(subsystem: "com.motherofbrand.BatteryBridge", category: "Browser")
     
     func startBrowsing() {
-        let parameters = NWParameters()
+        logger.info("Starting to browse for iPhone...")
+        setupBrowser()
+    }
+    
+    private func setupBrowser() {
+        let parameters = NWParameters.tcp
         parameters.includePeerToPeer = true
         
-        browser = NWBrowser(for: .bonjour(type: BatteryBridgeConstants.serviceType, domain: nil), using: parameters)
+        browser = NWBrowser(
+            for: .bonjour(type: BatteryBridgeConstants.serviceType, domain: nil),
+            using: parameters
+        )
         
-        browser?.stateUpdateHandler = { state in
+        browser?.stateUpdateHandler = { [weak self] state in
             switch state {
             case .ready:
-                print("Browser ready")
+                self?.logger.info("Browser ready")
             case .failed(let error):
-                print("Browser failed: \(error)")
-                self.isConnected = false
+                self?.logger.error("Browser failed: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self?.isConnected = false
+                }
             default:
                 break
             }
         }
         
-        browser?.browseResultsChangedHandler = { results, _ in
+        browser?.browseResultsChangedHandler = { [weak self] results, _ in
             guard let endpoint = results.first?.endpoint else { return }
-            self.connect(to: endpoint)
+            self?.connect(to: endpoint)
         }
         
         browser?.start(queue: .main)
@@ -38,15 +50,20 @@ class BatteryBrowser: ObservableObject {
         connection = NWConnection(to: endpoint, using: .tcp)
         
         connection?.stateUpdateHandler = { [weak self] state in
-            switch state {
-            case .ready:
-                print("Connection ready")
-                self?.isConnected = true
-                self?.receiveData()
-            case .failed:
-                self?.isConnected = false
-            default:
-                break
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                switch state {
+                case .ready:
+                    self.isConnected = true
+                    self.receiveData()
+                case .failed:
+                    self.isConnected = false
+                case .cancelled:
+                    self.isConnected = false
+                default:
+                    break
+                }
             }
         }
         
@@ -65,7 +82,16 @@ class BatteryBrowser: ObservableObject {
             
             if error == nil {
                 self?.receiveData()
+            } else {
+                DispatchQueue.main.async {
+                    self?.isConnected = false
+                }
             }
         }
+    }
+    
+    deinit {
+        browser?.cancel()
+        connection?.cancel()
     }
 }
