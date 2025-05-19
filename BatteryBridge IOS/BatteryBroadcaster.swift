@@ -9,6 +9,7 @@ class BatteryBroadcaster: ObservableObject {
     @Published var isConnected = false
     @Published var lastError: String?
     private let logger = Logger(subsystem: "com.motherofbrand.BatteryBridge", category: "Broadcaster")
+    private let broadcastInterval: TimeInterval = 1.0 // Interval between broadcasts for quick edits
     
     func startBroadcasting() {
         UIDevice.current.isBatteryMonitoringEnabled = true
@@ -79,9 +80,9 @@ class BatteryBroadcaster: ObservableObject {
     }
     
     private func setupBroadcastTimer() {
-        // Broadcast battery level every 1 second
+        // Broadcast battery level every broadcastInterval seconds
         broadcastTimer?.invalidate()
-        broadcastTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        broadcastTimer = Timer.scheduledTimer(withTimeInterval: broadcastInterval, repeats: true) { [weak self] _ in
             self?.broadcastBatteryLevel()
         }
     }
