@@ -2,7 +2,13 @@ import SwiftUI
 
 @main
 struct BatteryBridgeApp: App {
-    @StateObject private var browser = BatteryBrowser()
+    @StateObject private var browser: BatteryBrowser
+
+    init() {
+        let batteryBrowser = BatteryBrowser()
+        _browser = StateObject(wrappedValue: batteryBrowser)
+        batteryBrowser.startBrowsing()
+    }
     
     var body: some Scene {
         MenuBarExtra {

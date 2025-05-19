@@ -36,9 +36,6 @@ struct ContentView: View {
         }
         .frame(width: 200)
         .padding()
-        .onAppear {
-            browser.startBrowsing()
-        }
     }
     
     private var batteryIcon: String {
