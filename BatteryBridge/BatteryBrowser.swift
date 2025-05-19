@@ -72,8 +72,14 @@ class BatteryBrowser: ObservableObject {
                         self?.logger.info("Retrying connection...")
                         self?.connect(to: endpoint)
                     }
-                case .failed:
+                case .failed(let error):
+                    self.logger.error("Connection failed: \(error.localizedDescription)")
                     self.isConnected = false
+                    self.connection?.cancel()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                        self?.logger.info("Retrying connection after failure...")
+                        self?.connect(to: endpoint)
+                    }
                 case .cancelled:
                     self.isConnected = false
                 default:
