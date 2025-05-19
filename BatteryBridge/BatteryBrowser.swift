@@ -28,10 +28,17 @@ class BatteryBrowser: ObservableObject {
             switch state {
             case .ready:
                 self?.logger.info("Browser ready")
+            case .waiting(let error):
+                self?.logger.warning("Browser waiting: \(error.localizedDescription)")
             case .failed(let error):
                 self?.logger.error("Browser failed: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self?.isConnected = false
+                }
+                self?.browser?.cancel()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                    self?.logger.info("Retrying browser...")
+                    self?.setupBrowser()
                 }
             default:
                 break
@@ -51,12 +58,20 @@ class BatteryBrowser: ObservableObject {
         
         connection?.stateUpdateHandler = { [weak self] state in
             guard let self = self else { return }
-            
+
             DispatchQueue.main.async {
                 switch state {
                 case .ready:
                     self.isConnected = true
                     self.receiveData()
+                case .waiting(let error):
+                    self.logger.warning("Connection waiting: \(error.localizedDescription)")
+                    self.isConnected = false
+                    self.connection?.cancel()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                        self?.logger.info("Retrying connection...")
+                        self?.connect(to: endpoint)
+                    }
                 case .failed:
                     self.isConnected = false
                 case .cancelled:
