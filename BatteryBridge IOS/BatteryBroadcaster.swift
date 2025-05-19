@@ -157,5 +157,10 @@ class BatteryBroadcaster: ObservableObject {
         broadcastTimer?.invalidate()
         listener?.cancel()
         connections.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIDevice.batteryLevelDidChangeNotification,
+            object: nil
+        )
     }
 }

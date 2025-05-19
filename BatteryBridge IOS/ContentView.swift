@@ -4,6 +4,7 @@ import UIKit
 struct ContentView: View {
     @StateObject private var broadcaster = BatteryBroadcaster()
     @State private var actualBatteryLevel: Float = 0.0
+    @State private var batteryObserver: NSObjectProtocol?
     
     var body: some View {
         NavigationStack {
@@ -45,21 +46,31 @@ struct ContentView: View {
             .onAppear {
                 startMonitoring()
             }
+            .onDisappear {
+                stopMonitoring()
+            }
         }
     }
-    
+
     private func startMonitoring() {
         UIDevice.current.isBatteryMonitoringEnabled = true
         updateBatteryLevel()
         broadcaster.startBroadcasting()
-        
+
         // Set up battery monitoring
-        NotificationCenter.default.addObserver(
+        batteryObserver = NotificationCenter.default.addObserver(
             forName: UIDevice.batteryLevelDidChangeNotification,
             object: nil,
             queue: .main
         ) { _ in
             updateBatteryLevel()
+        }
+    }
+
+    private func stopMonitoring() {
+        if let observer = batteryObserver {
+            NotificationCenter.default.removeObserver(observer)
+            batteryObserver = nil
         }
     }
     
