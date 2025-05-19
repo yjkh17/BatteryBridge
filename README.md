@@ -4,7 +4,7 @@ BatteryBridge consists of two Swift apps:
 - **BatteryBridge** (macOS)
 - **BatteryBridge IOS** (iOS)
 
-The iOS app broadcasts the current battery level using Bonjour on port 54321. The macOS app listens for that broadcast and shows the iOS device's battery level in the macOS menu bar.
+The iOS app broadcasts the current battery level using Bonjour on port 54321. The macOS app listens for that broadcast and shows the iOS device's battery level in the macOS menu bar. iOS typically reports battery level in 5% increments and the app reflects that limitation.
 
 ## Prerequisites
 - Xcode 15 or later
