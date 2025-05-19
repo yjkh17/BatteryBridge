@@ -79,7 +79,7 @@ class BatteryBroadcaster: ObservableObject {
     }
     
     private func setupBroadcastTimer() {
-        // Broadcast battery level every 1 seconds
+        // Broadcast battery level every 1 second
         broadcastTimer?.invalidate()
         broadcastTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.broadcastBatteryLevel()
