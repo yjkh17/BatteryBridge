@@ -8,8 +8,8 @@ The iOS app broadcasts the current battery level using Bonjour on port 54321. Th
 
 ## Prerequisites
 - Xcode 15 or later
-- macOS deployment target: 15.4
-- iOS deployment target: 18.4
+- macOS deployment target: 14
+- iOS deployment target: 17
 
 ## Building and Running
 1. Open `BatteryBridge.xcodeproj` in Xcode.
