@@ -22,3 +22,6 @@ The iOS app broadcasts the current battery level using Bonjour on port 54321. Th
    - Build and run (⌘R). Leave the app in the foreground so it can broadcast the battery level.
 
 Run the iOS app first. It will advertise a Bonjour service named `BatteryBridge` on port `54321`. After launching the macOS app, it will automatically discover the service on your local network and display the reported battery percentage in the menu bar.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
